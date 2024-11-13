@@ -40,7 +40,7 @@ const Calculator = () => {
 					setValue={setValue}
 					setResult={setResult}
 					setError={setError}
-					className='gap-2 justify-items-end'
+					className='gap-2 justify-items-end mathOperationsBlock'
 					symbols={mathOperationsBlock}
 				/>
 				<BlockButtons
@@ -48,7 +48,7 @@ const Calculator = () => {
 					setValue={setValue}
 					setResult={setResult}
 					setError={setError}
-					className='grid-cols-3 gap-2 '
+					className='grid-cols-3 gap-2 digitsBlock'
 					symbols={digitsBlock}
 				/>
 				<BlockButtons
@@ -56,7 +56,7 @@ const Calculator = () => {
 					setValue={setValue}
 					setResult={setResult}
 					setError={setError}
-					className='gap-2'
+					className='gap-2 operatorsBlock'
 					symbols={operatorsBlock}
 				/>
 			</div>

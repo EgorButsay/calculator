@@ -1,6 +1,6 @@
 'use client'
 
-import React, { SetStateAction, useState } from 'react'
+import React, { SetStateAction } from 'react'
 import Button from '../button/Button'
 
 import { MATH_OPERATIONS } from '@/data/arithmetic'
@@ -23,15 +23,12 @@ const BlockButtons: React.FC<Props> = ({
 	symbols,
 	className,
 }) => {
-	const [isFunctionActive, setIsFunctionActive] = useState(false)
-
 	const handleClick = (val: string | number) => {
 		try {
 			if (val === MATH_OPERATIONS.AC) {
 				setValue('')
 				setResult(null)
 				setError(null)
-				setIsFunctionActive(false)
 				return
 			}
 
@@ -43,51 +40,64 @@ const BlockButtons: React.FC<Props> = ({
 					MATH_OPERATIONS.LOG,
 				].includes(val as string)
 			) {
-				setValue(prev => prev + `${val}(`)
-				setIsFunctionActive(true)
+				setValue(prev => `${prev}${val}(`)
 				return
 			}
 
 			if (MATH_OPERATIONS.SQUARE === val) {
-				const percent = Math.sqrt(value as number)
-				setResult(percent.toString())
-			}
-
-			if (!isNaN(Number(val)) && isFunctionActive) {
-				setValue(prev => prev + val.toString() + ')')
-				setIsFunctionActive(false)
-				return
-			}
-
-			if (isFunctionActive && val === '=') {
-				setValue(prev => prev + `)${val.toString()}`)
-				setResult(evaluate(`${value.toString()} + ')'`))
-				setIsFunctionActive(false)
+				const result = Math.sqrt(Number(value))
+				setValue(`${MATH_OPERATIONS.SQUARE}${value}`)
+				setResult(result.toString())
 				return
 			}
 
 			if (val === '=') {
-				setResult(evaluate(value.toString()))
-				setIsFunctionActive(true)
+				const needsClosingBracket = ['sin(', 'cos(', 'tan(', 'log('].some(
+					func => value.toString().startsWith(func)
+				)
+
+				console.log('needsClosingBracket', needsClosingBracket)
+
+				const finalExpression = needsClosingBracket ? `${value})` : value
+				setValue(finalExpression)
+				const evaluatedResult = evaluate(finalExpression.toString())
+				setResult(evaluatedResult.toString())
 				return
 			}
 
 			setValue(prev => prev + val.toString())
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		} catch (e) {
+			console.error(e)
 			setError('You have entered incorrect data!')
 		}
 	}
 
 	return (
 		<div className={`grid w-full ${className}`}>
-			{symbols.map(value => (
-				<Button
-					key={value.toString()}
-					value={value}
-					onClick={() => handleClick(value)}
-				/>
-			))}
+			{symbols.map((symbol, index) => {
+				let customStyle = ''
+				if (className.includes('mathOperationsBlock')) {
+					customStyle = 'bg-neutral-200 '
+				} else if (className.includes('digitsBlock') && index < 3) {
+					customStyle = 'bg-neutral-200 '
+				} else if (
+					className.includes('digitsBlock') &&
+					index === symbols.length - 1
+				) {
+					customStyle = 'bg-blue-600 text-white'
+				} else if (className.includes('operatorsBlock')) {
+					customStyle = 'bg-neutral-200 '
+				}
+
+				return (
+					<Button
+						key={symbol.toString()}
+						value={symbol}
+						onClick={() => handleClick(symbol)}
+						customStyle={customStyle}
+					/>
+				)
+			})}
 		</div>
 	)
 }
